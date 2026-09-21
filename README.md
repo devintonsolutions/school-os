@@ -29,7 +29,7 @@ school-os/
 ### Prerequisites
 
 - Node.js 18+
-- PostgreSQL (or use Supabase)
+- PostgreSQL
 
 ### Run Locally
 
