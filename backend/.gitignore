@@ -6,3 +6,6 @@ dist/
 .env.test.local
 .env.production.local
 *.log
+
+
+src/generated/prisma
