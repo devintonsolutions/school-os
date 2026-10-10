@@ -1,4 +1,4 @@
-import type { Request, Response } from "express";
+import type { Request, Response, NextFunction } from "express";
 import * as authService from "./auth.service";
 
 export async function signup(
@@ -41,6 +41,8 @@ export async function me(
   });
 }
 
+
+
 export async function refresh(
   req: Request,
   res: Response
@@ -68,3 +70,14 @@ export async function logout(
   });
 }
 
+export async function updateMe(req:Request, res:Response, next:NextFunction){
+  if(Object.keys(req.body).length === 0){
+    return res.status(400).json({'message':'Provide atleast one field to update'})
+  }
+  try{
+    const updateUser =  await authService.updateCurrentUser( req.user!.id, req.body )
+    return res.status(200).json(updateUser)
+  }catch(e){
+    next(e)
+  }
+}

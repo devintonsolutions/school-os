@@ -8,6 +8,7 @@ import type {
   signUpSchema,
   loginSchema,
   refreshTokenSchema,
+  userSelfUpdateSchema
 } from "./auth.schema";
 
 import type { z } from "zod";
@@ -15,6 +16,7 @@ import type { z } from "zod";
 type SignUpInput = z.infer<typeof signUpSchema>;
 type LoginInput = z.infer<typeof loginSchema>;
 type RefreshTokenInput = z.infer<typeof refreshTokenSchema>;
+type userSelfUpdateInput = z.infer<typeof userSelfUpdateSchema>;
 
 function generateRefreshToken(): string {
   return crypto.randomBytes(64).toString("hex");
@@ -138,6 +140,28 @@ export async function getCurrentUser(userId: string) {
     role: user.role,
     emailVerifiedAt: user.emailVerifiedAt,
   };
+}
+
+export async function updateCurrentUser(userId: string, data: userSelfUpdateInput){
+
+  const updatedUser = await prisma.user.update({
+    where:{
+      'id':userId
+    },
+    data:data,
+    select:{
+      'id':true,
+      'firstName':true,
+      'lastName':true,
+      'email':true,
+      'bio':true,
+      'avatarUrl':true,
+      'role':true
+    }
+  })
+
+  return updatedUser
+
 }
 
 export async function refreshAccessToken(data: RefreshTokenInput) {
