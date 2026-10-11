@@ -7,11 +7,11 @@ import { z } from "zod";
  * - `id`: Automatically generated UUID.
  * - `studentId`: Extracted strictly from authenticated `req.user.id`.
  * - `lessonId`: Provided via route parameter `:lessonId`.
- * - `completedAt`, `lastAccessedAt`: Managed server-side based on completion status.
+ * - `completedAt`: Managed server-side based on completion status.
  */
 export const markLessonProgressSchema = z
   .object({
-    isCompleted: z.boolean(),
+    completed: z.boolean(),
   })
   .strict();
 

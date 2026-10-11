@@ -5,8 +5,7 @@ import { z } from "zod";
  *
  * Intentionally Excluded from Request Body:
  * - `id`: System-generated UUID.
- * - `slug`: Derived server-side from `name` via slugify utility to prevent spoofing/collisions.
- * - `createdAt`, `updatedAt`: System-managed timestamps.
+ * (Note: Category only has id, name, description in the real schema).
  */
 export const createCategorySchema = z
   .object({
@@ -31,8 +30,6 @@ export type CreateCategoryInput = z.infer<typeof createCategorySchema>;
  *
  * Intentionally Excluded from Request Body:
  * - `id`: Specified via route parameter `:id`.
- * - `slug`: Recomputed server-side if `name` changes.
- * - `createdAt`, `updatedAt`: System-managed.
  * Requires at least one updatable field.
  */
 export const updateCategorySchema = z

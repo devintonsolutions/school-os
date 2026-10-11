@@ -9,10 +9,8 @@ export type CourseStatus = z.infer<typeof courseStatusEnum>;
  *
  * Intentionally Excluded from Request Body:
  * - `id`: Generated as a UUID by PostgreSQL.
- * - `slug`: Derived server-side from `title` via slugify utility.
  * - `teacherId`: Injected strictly from the authenticated teacher/admin session (`req.user.id`).
  * - `status`: Always initialized to `DRAFT` upon creation; cannot be self-published on create.
- * - `price`: Omitted as monetization is out of scope for Core LMS v1.
  * - `createdAt`, `updatedAt`: Managed automatically by the database.
  */
 export const createCourseSchema = z
@@ -29,7 +27,7 @@ export const createCourseSchema = z
       .max(5000, "Description cannot exceed 5000 characters")
       .optional(),
 
-    thumbnailUrl: z
+    thumbnail: z
       .url("Thumbnail URL must be a valid URL")
       .refine((url) => url.startsWith("https://"), {
         message: "Thumbnail URL must use secure HTTPS protocol",
@@ -49,7 +47,6 @@ export type CreateCourseInput = z.infer<typeof createCourseSchema>;
  * - `id`: Identified via route param `:id`.
  * - `teacherId`: Ownership cannot be transferred via basic course edit.
  * - `status`: Lifecycle transitions are governed via the dedicated `updateCourseStatusSchema`.
- * - `slug`: Re-derived server-side only if `title` changes.
  */
 export const updateCourseSchema = z
   .object({
@@ -66,7 +63,7 @@ export const updateCourseSchema = z
       .max(5000, "Description cannot exceed 5000 characters")
       .optional(),
 
-    thumbnailUrl: z
+    thumbnail: z
       .url("Thumbnail URL must be a valid URL")
       .refine((url) => url.startsWith("https://"), {
         message: "Thumbnail URL must use secure HTTPS protocol",
@@ -80,7 +77,7 @@ export const updateCourseSchema = z
     (data) =>
       data.title !== undefined ||
       data.description !== undefined ||
-      data.thumbnailUrl !== undefined ||
+      data.thumbnail !== undefined ||
       data.categoryId !== undefined,
     { message: "At least one field must be provided for course update" }
   );

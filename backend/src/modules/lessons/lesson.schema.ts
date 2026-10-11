@@ -1,15 +1,12 @@
 import { z } from "zod";
 
-export const lessonTypeEnum = z.enum(["VIDEO", "ARTICLE"]);
-export type LessonType = z.infer<typeof lessonTypeEnum>;
-
 /**
  * Schema for creating a lesson within a module.
  *
  * Intentionally Excluded from Request Body:
  * - `id`: Generated UUID.
  * - `moduleId`: Provided via route parameter `:moduleId`.
- * - `createdAt`, `updatedAt`: System timestamps.
+ * (Note: type, durationMinutes, and isFreePreview were removed from real Prisma schema).
  */
 export const createLessonSchema = z
   .object({
@@ -31,17 +28,6 @@ export const createLessonSchema = z
         message: "Video URL must use secure HTTPS protocol",
       })
       .optional(),
-
-    durationMinutes: z
-      .number()
-      .int("Duration must be an integer")
-      .min(1, "Duration must be at least 1 minute")
-      .max(1440, "Duration cannot exceed 1440 minutes (24 hours)")
-      .optional(),
-
-    type: lessonTypeEnum,
-
-    isFreePreview: z.boolean().optional(),
 
     order: z
       .number()
@@ -83,17 +69,6 @@ export const updateLessonSchema = z
       })
       .optional(),
 
-    durationMinutes: z
-      .number()
-      .int("Duration must be an integer")
-      .min(1, "Duration must be at least 1 minute")
-      .max(1440, "Duration cannot exceed 1440 minutes (24 hours)")
-      .optional(),
-
-    type: lessonTypeEnum.optional(),
-
-    isFreePreview: z.boolean().optional(),
-
     order: z
       .number()
       .int("Order must be an integer")
@@ -106,9 +81,6 @@ export const updateLessonSchema = z
       data.title !== undefined ||
       data.content !== undefined ||
       data.videoUrl !== undefined ||
-      data.durationMinutes !== undefined ||
-      data.type !== undefined ||
-      data.isFreePreview !== undefined ||
       data.order !== undefined,
     { message: "At least one field must be provided for lesson update" }
   );

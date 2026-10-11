@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { paginationQuerySchema } from "../lms-shared/common.schema";
 
-export const enrollmentStatusEnum = z.enum(["ACTIVE", "COMPLETED", "CANCELLED"]);
+export const enrollmentStatusEnum = z.enum(["ACTIVE", "COMPLETED", "DROPPED"]);
 export type EnrollmentStatus = z.infer<typeof enrollmentStatusEnum>;
 
 /**
@@ -9,8 +9,8 @@ export type EnrollmentStatus = z.infer<typeof enrollmentStatusEnum>;
  *
  * Intentionally Excluded from Request Body:
  * - `studentId`: Extracted securely from `req.user.id`. Clients cannot enroll on behalf of others.
- * - `status`: Always initialized as `ACTIVE` (or re-activated if previously `CANCELLED`).
- * - `enrolledAt`, `completedAt`: System timestamps.
+ * - `status`: Always initialized as `ACTIVE` (or re-activated if previously `DROPPED`).
+ * - `enrolledAt`: System timestamp.
  */
 export const enrollSchema = z
   .object({
