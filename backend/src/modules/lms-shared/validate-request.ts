@@ -13,8 +13,8 @@ export interface RequestValidationSchemas {
  * Design Notes:
  * - On validation failure, passes the ZodError directly to next(err) so the global
  *   errorMiddleware (in src/middleware/error.middleware.ts) formats the standard 400 response.
- * - In Express 5 (and @types/express 5), req.query is defined as a read-only getter on the
- *   Request object. Directly assigning to req.query can cause runtime TypeError or TS build errors.
+ * - In Express 4 (with @types/express 5 / future Express 5), req.query is treated as a read-only
+ *   getter on the Request object in TypeScript. Directly assigning to req.query causes TS type errors.
  *   Therefore, validated/coerced query data is stored in res.locals.query.
  * - req.body and req.params are updated in-place with parsed/coerced data where allowed.
  */
