@@ -1,5 +1,6 @@
 import express from "express";
 import authRouter from "./routes/auth.router";
+import userRouter from "./routes/users.router"
 import { errorMiddleware } from "./middleware/error.middleware";
 
 const app = express();
@@ -13,6 +14,7 @@ app.get("/health", (req, res) => {
 });
 
 app.use("/api/auth", authRouter);
+app.use("/api/users", userRouter)
 
 // Must be after all routes
 app.use(errorMiddleware);
