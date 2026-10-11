@@ -85,7 +85,7 @@ export async function userUpdateStatus(
       });
     }
     if (typeof isActive !== "boolean") {
-      res.status(400).json({ message: "isActive must be a boolean" });
+      return res.status(400).json({ message: "isActive must be a boolean" });
     }
     return res
       .status(200)
