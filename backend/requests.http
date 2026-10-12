@@ -1,0 +1,57 @@
+### Variables
+@baseUrl = http://localhost:4000
+@accessToken = YOUR_ACCESS_TOKEN_HERE
+@refreshToken = YOUR_REFRESH_TOKEN_HERE
+
+### 1. Health Check
+GET {{baseUrl}}/health
+
+### 2. Sign Up (Create Student Account)
+POST {{baseUrl}}/api/v1/auth/signup
+Content-Type: application/json
+
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john.doe@example.com",
+  "password": "Password123!"
+}
+
+### 3. Log In
+POST {{baseUrl}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "john.doe@example.com",
+  "password": "Password123!"
+}
+
+### 4. Get Current User Profile (Protected)
+GET {{baseUrl}}/api/v1/auth/me
+Authorization: Bearer {{accessToken}}
+
+### 5. Update Profile
+PATCH {{baseUrl}}/api/v1/auth/me
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "firstName": "Johnny",
+  "bio": "Software Engineering Student"
+}
+
+### 6. Refresh Access Token
+POST {{baseUrl}}/api/v1/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### 7. Log Out (Revoke Refresh Token)
+POST {{baseUrl}}/api/v1/auth/logout
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}

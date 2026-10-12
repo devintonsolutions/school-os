@@ -1,5 +1,5 @@
 import { prisma } from "../../config/database";
-import type { Role } from "@prisma/client";
+import type { Role } from "../../generated/prisma/client";
 const publicUserSelect = {
   id: true,
   firstName: true,

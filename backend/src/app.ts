@@ -13,8 +13,8 @@ app.get("/health", (req, res) => {
   });
 });
 
-app.use("api/v1/auth", authRouter);
-app.use("api/v1/users", userRouter);
+app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/users", userRouter);
 
 // Must be after all routes
 app.use(errorMiddleware);

@@ -7,7 +7,9 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "lint": "eslint src/",
-    "prisma:generate": "prisma generate"
+    "prisma:generate": "prisma generate",
+    "prisma:studio": "prisma studio",
+    "test:schema": "tsx src/scripts/test-schema.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.0",
