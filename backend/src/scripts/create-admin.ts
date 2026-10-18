@@ -3,8 +3,8 @@ import bcrypt from "bcryptjs";
 import { prisma } from "../config/database"; // Adjust to your Prisma instance
 
 async function main() {
-  const email = process.env.ADMIN_EMAIL;
-  const password = process.env.ADMIN_PASSWORD;
+  const email = process.env.ADMIN_EMAIL!; // use this env variable to create test admin account TEST_ADMIN_EMAIL!;
+  const password = process.env.ADMIN_PASSWORD!; // use this env variable to create test admin account TEST_ADMIN_PASSWORD!;
 
   if (!password) {
     throw new Error("ADMIN_PASSWORD is not set");
