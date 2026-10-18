@@ -7,8 +7,8 @@ import { authorize } from '../middleware/role.middleware';
 
 const router = Router();
 
-router.get('',authenticate, authorize('ADMIN'), asyncHandler(userGetAll));
-router.patch('/:userId/role',authenticate, authorize('ADMIN'), asyncHandler(userUpdateRole))
-router.patch('/:userId/status', authenticate, authorize('ADMIN'), asyncHandler(userUpdateStatus))
+router.get('/',authenticate, authorize('ADMIN'), asyncHandler(userGetAll));
+router.patch('/:userId/role/',authenticate, authorize('ADMIN'), asyncHandler(userUpdateRole))
+router.patch('/:userId/status/', authenticate, authorize('ADMIN'), asyncHandler(userUpdateStatus))
 
 export default router;
