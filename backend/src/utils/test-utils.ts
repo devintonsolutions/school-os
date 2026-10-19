@@ -2,7 +2,7 @@ import request  from "supertest"
 import app from '../app'
 import { expect } from 'vitest';
 
-export const getStudentTestTokens = async () => {
+export const getTestStudentTokens = async () => {
     const response = await request(app)
     .post("/api/v1/auth/login/")
     .send({
@@ -13,12 +13,13 @@ export const getStudentTestTokens = async () => {
     expect(response.status).toBe(200)
 
     return {
+        student: response.body.data.user,
         accessToken:response.body.data.accessToken as string,
         refreshToken:response.body.data.refreshToken as string
     }
 }
 
-export const getAdminTestTokens = async () => {
+export const getTestAdminTokens = async () => {
     const response = await request(app)
     .post("/api/v1/auth/login/")
     .send({
@@ -29,7 +30,7 @@ export const getAdminTestTokens = async () => {
     expect(response.status).toBe(200)
 
     return {
-        accessToken:response.body.data.accessToken as string,
-        refreshToken:response.body.data.refreshToken as string
+        adminAccessToken:response.body.data.accessToken as string,
+        adminRefreshToken:response.body.data.refreshToken as string
     }
 }

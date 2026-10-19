@@ -1,10 +1,26 @@
-import { describe, it, expect } from 'vitest';
-import request from 'supertest';
-import app from '../app';
-import { getStudentTestTokens } from '../utils/test-utils';
+import {
+  describe,
+  it,
+  expect,
+  beforeAll,
+} from "vitest";
+import request from "supertest";
+import app from "../app";
+import { getTestStudentTokens } from "../utils/test-utils";
 
-describe('Authentication', async ()=>{
-    let { accessToken, refreshToken} = await getStudentTestTokens()
+describe("Authentication", () => {
+  let student: Awaited<ReturnType<typeof getTestStudentTokens>>["student"];
+  let accessToken: string;
+  let refreshToken: string;
+
+  beforeAll(async () => {
+    const tokens = await getTestStudentTokens();
+
+    student = tokens.student;
+    accessToken = tokens.accessToken;
+    refreshToken = tokens.refreshToken;
+  });
+
     it("testing signup endpoint",async ()=>{
         const uniqueEmail = `student.test.${crypto.randomUUID()}@schoolos.com`
         const response = await request(app)
@@ -78,5 +94,6 @@ describe('Authentication', async ()=>{
         })   
         expect(response.status).toBe(200)
     })
-})
+});
+
 
