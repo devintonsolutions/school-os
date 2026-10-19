@@ -4,6 +4,7 @@ import { AppError } from "../../utils/app-error";
 import { comparePassword, hashPassword } from "../../utils/password";
 import { createAccessToken } from "../../utils/jwt";
 
+
 import type {
   signUpSchema,
   loginSchema,
@@ -12,6 +13,8 @@ import type {
 } from "./auth.schema";
 
 import type { z } from "zod";
+
+const EMAIL_VERIFICATION_TOKEN_EXPIRATION_MINUTES = 15;
 
 type SignUpInput = z.infer<typeof signUpSchema>;
 type LoginInput = z.infer<typeof loginSchema>;
@@ -25,7 +28,7 @@ function generateRefreshToken(): string {
 function hashRefreshToken(token: string): string {
   return crypto.createHash("sha256").update(token).digest("hex");
 }
-
+// this service is only designed for student signup not for teachers or admins 
 export async function signup(data: SignUpInput) {
   const existingUser = await prisma.user.findUnique({
     where: {
@@ -36,26 +39,44 @@ export async function signup(data: SignUpInput) {
   if (existingUser) {
     throw new AppError("Email is already registered", 409);
   }
+  
+  const { user, emailVerificationToken } = await prisma.$transaction(async (tx) => {
 
-  const passwordHash = await hashPassword(data.password);
+    const passwordHash = await hashPassword(data.password);
+  
+    const user = await tx.user.create({
+      data: {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        passwordHash,
+        role: "STUDENT",
+      },
+    });
+  
+    const token = crypto.randomBytes(32).toString("hex")
+  
+    const tokenHash = crypto.createHash("sha256").update(token).digest("hex")
+  
+    const expiresAt = new Date(
+      Date.now() + EMAIL_VERIFICATION_TOKEN_EXPIRATION_MINUTES * 60 * 1000
+    )
+    const emailVerificationToken = await tx.emailVerificationToken.create({
+      data:{
+        userId: user.id,
+        tokenHash: tokenHash,
+        expiresAt: expiresAt
+      }
+    })
 
-  const user = await prisma.user.create({
-    data: {
-      firstName: data.firstName,
-      lastName: data.lastName,
-      email: data.email,
-      passwordHash,
-      role: "STUDENT",
-    },
-  });
-
+    return { user, emailVerificationToken }
+  })
   return {
-    id: user.id,
+    email: user.email,
     firstName: user.firstName,
     lastName: user.lastName,
-    email: user.email,
     role: user.role,
-    emailVerifiedAt: user.emailVerifiedAt,
+    
   };
 }
 
