@@ -5,6 +5,8 @@
 @courseId = 00000000-0000-0000-0000-000000000001
 @assignmentId = YOUR_ASSIGNMENT_ID_HERE
 @submissionId = YOUR_SUBMISSION_ID_HERE
+@quizId = YOUR_QUIZ_ID_HERE
+@attemptId = YOUR_ATTEMPT_ID_HERE
 
 ### ============================================================
 ### AUTHENTICATION & PROFILE
@@ -130,3 +132,109 @@ Content-Type: application/json
 ### 16. Delete Assignment (Teacher or Admin)
 DELETE {{baseUrl}}/api/v1/assignments/{{assignmentId}}
 Authorization: Bearer {{accessToken}}
+
+
+### ============================================================
+### DEVELOPER 3: QUIZZES & AUTOMATED GRADING ENGINE
+### ============================================================
+
+### 17. Create Quiz (Teacher or Admin)
+POST {{baseUrl}}/api/v1/quizzes
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Quiz 1: Data Structures Fundamentals",
+  "description": "Test your knowledge on Stacks, Queues, and Binary Search Trees.",
+  "courseId": "{{courseId}}",
+  "timeLimit": 30
+}
+
+### 18. Add Question: Single Choice (Teacher or Admin)
+POST {{baseUrl}}/api/v1/quizzes/{{quizId}}/questions
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "questionText": "What is the average time complexity of searching in a Balanced Binary Search Tree?",
+  "questionType": "SINGLE_CHOICE",
+  "points": 2,
+  "options": [
+    { "optionText": "O(1)", "isCorrect": false },
+    { "optionText": "O(log n)", "isCorrect": true },
+    { "optionText": "O(n)", "isCorrect": false },
+    { "optionText": "O(n^2)", "isCorrect": false }
+  ]
+}
+
+### 19. Add Question: True/False (Teacher or Admin)
+POST {{baseUrl}}/api/v1/quizzes/{{quizId}}/questions
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "questionText": "A queue follows the Last-In-First-Out (LIFO) order.",
+  "questionType": "TRUE_FALSE",
+  "points": 1,
+  "options": [
+    { "optionText": "True", "isCorrect": false },
+    { "optionText": "False", "isCorrect": true }
+  ]
+}
+
+### 20. Add Question: Short Answer (Teacher or Admin)
+POST {{baseUrl}}/api/v1/quizzes/{{quizId}}/questions
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "questionText": "Which data structure operates on a First-In-First-Out (FIFO) principle?",
+  "questionType": "SHORT_ANSWER",
+  "points": 2,
+  "options": [
+    { "optionText": "queue", "isCorrect": true }
+  ]
+}
+
+### 21. Get Quizzes by Course (Student, Teacher, or Admin)
+GET {{baseUrl}}/api/v1/quizzes/course/{{courseId}}
+Authorization: Bearer {{accessToken}}
+
+### 22. Get Quiz Details & Questions (Student View hides answers, Teacher View shows isCorrect)
+GET {{baseUrl}}/api/v1/quizzes/{{quizId}}
+Authorization: Bearer {{accessToken}}
+
+### 23. Start Quiz Attempt (Enrolled Student)
+POST {{baseUrl}}/api/v1/quizzes/{{quizId}}/attempts/start
+Authorization: Bearer {{accessToken}}
+
+### 24. Submit Quiz Attempt & Run Automated Grading Engine (Student)
+POST {{baseUrl}}/api/v1/quizzes/attempts/{{attemptId}}/submit
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "answers": [
+    {
+      "questionId": "QUESTION_1_ID",
+      "selectedOptionId": "OPTION_ID_HERE"
+    },
+    {
+      "questionId": "QUESTION_2_ID",
+      "selectedOptionId": "OPTION_ID_HERE"
+    },
+    {
+      "questionId": "QUESTION_3_ID",
+      "answerText": "queue"
+    }
+  ]
+}
+
+### 25. Get Student's Past Attempts & Scores (Student)
+GET {{baseUrl}}/api/v1/quizzes/{{quizId}}/attempts/me
+Authorization: Bearer {{accessToken}}
+
+### 26. List All Student Attempts for a Quiz (Teacher or Admin)
+GET {{baseUrl}}/api/v1/quizzes/{{quizId}}/attempts
+Authorization: Bearer {{accessToken}}
+
