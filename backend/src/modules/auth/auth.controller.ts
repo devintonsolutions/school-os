@@ -81,3 +81,35 @@ export async function updateMe(req:Request, res:Response, next:NextFunction){
     next(e)
   }
 }
+export async function resendVerification(req: Request, res: Response, next: NextFunction){
+
+
+  if(!req.body.email){
+    return res.status(400).json({'message':'Email is required'})
+  }
+  const email = req.body.email;
+  try{
+    await authService.resendVerificationEmail(email);
+    return res.status(200).json({"message":"If an eligible account exists, a verification email will be sent."})
+  }catch(e){
+    next(e);
+  }
+}
+
+export async function verifyEmail(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const { token } = req.body;
+
+    await authService.verifyEmail(token);
+
+    return res.status(200).json({
+      message: "Email verified successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+}

@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { toLowerCase, z } from "zod";
 
 export const signUpSchema = z.object({
   firstName: z
@@ -51,3 +51,14 @@ export const userSelfUpdateSchema = z.object({
   bio: z.string().trim().max(300).nullable().optional(),
   avatarUrl: z.url().nullable().optional()
 }).strict()
+
+export const userSendEmailVerificationSchema = z.object({
+  email: z
+  .string()
+  .email()
+  .transform((email)=> email.toLowerCase().trim())
+})
+
+export const userEmailVerificationTokenSchema = z.object({
+  token: z.string().min(1,"Token is required")
+})

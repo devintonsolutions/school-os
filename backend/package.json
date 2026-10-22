@@ -9,8 +9,8 @@
     "lint": "eslint src/",
     "prisma:generate": "prisma generate",
     "create-admin": "tsx src/scripts/create-admin.ts",
-    "create-test-teacher":"tsx src/scripts/create-test-teacher.ts",
-    "test":"vitest run",
+    "create-test-teacher": "tsx src/scripts/create-test-teacher.ts",
+    "test": "vitest run",
     "prisma:studio": "prisma studio",
     "test:schema": "tsx src/scripts/test-schema.ts",
     "seed": "tsx prisma/seed.ts"
@@ -26,6 +26,7 @@
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.3",
     "morgan": "^1.10.0",
+    "nodemailer": "^10.1.7",
     "prisma": "^7.10.0",
     "zod": "^4.6.5"
   },
@@ -35,6 +36,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/morgan": "^1.9.9",
     "@types/node": "^20.19.43",
+    "@types/nodemailer": "^8.0.2",
     "@types/supertest": "^7.2.1",
     "nodemon": "^3.1.14",
     "supertest": "^7.3.1",
