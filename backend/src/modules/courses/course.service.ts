@@ -153,20 +153,135 @@ export async function listMyCourses(
   return buildPaginatedResponse(courses, total, query.page ?? 1, query.limit ?? 10);
 }
 
+type CourseAccess = {
+  id: string;
+  teacherId: string;
+  status: string;
+};
+
+/**
+ * Loads only the course fields needed to decide what the caller may see.
+ */
+async function getCourseAccessOrThrow(id: string): Promise<CourseAccess> {
+  const course = await prisma.course.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      teacherId: true,
+      status: true,
+    },
+  });
+
+  if (!course) {
+    throw new AppError("Course not found", 404);
+  }
+
+  return course;
+}
+
+/**
+ * Any enrollment row is enough for full lesson access (same rule as Lessons API).
+ */
+async function isEnrolledStudent(
+  courseId: string,
+  studentId: string
+): Promise<boolean> {
+  const enrollment = await prisma.enrollment.findUnique({
+    where: {
+      studentId_courseId: {
+        studentId,
+        courseId,
+      },
+    },
+    select: { id: true },
+  });
+
+  return Boolean(enrollment);
+}
+
 export async function getCourseById(
   id: string,
   user: AuthenticatedUser
 ) {
+  const access = await getCourseAccessOrThrow(id);
+  const isOwner = access.teacherId === user.id;
+  const isAdmin = user.role === "ADMIN";
+
+  // Visibility check: Return 404 (not 403) when user must not see the course
+  if (access.status !== "PUBLISHED" && !isOwner && !isAdmin) {
+    throw new AppError("Course not found", 404);
+  }
+
+  // Full content: owner teacher, admin, or an enrolled student.
+  // Non-owner teachers and non-enrolled students get the curriculum preview.
+  let canViewFullContent = isOwner || isAdmin;
+
+  if (
+    !canViewFullContent &&
+    access.status === "PUBLISHED" &&
+    user.role === "STUDENT"
+  ) {
+    canViewFullContent = await isEnrolledStudent(access.id, user.id);
+  }
+
+  if (canViewFullContent) {
+    const course = await prisma.course.findUnique({
+      where: { id },
+      include: {
+        teacher: { select: teacherSelect },
+        category: { select: categorySelect },
+        modules: {
+          orderBy: { order: "asc" },
+          include: {
+            lessons: {
+              orderBy: { order: "asc" },
+            },
+          },
+        },
+        _count: {
+          select: {
+            enrollments: true,
+          },
+        },
+      },
+    });
+
+    if (!course) {
+      throw new AppError("Course not found", 404);
+    }
+
+    return course;
+  }
+
+  // Curriculum preview: module + lesson titles/order only.
+  // No content, videoUrl, moduleId, or module description.
   const course = await prisma.course.findUnique({
     where: { id },
-    include: {
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      thumbnail: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
+      teacherId: true,
+      categoryId: true,
       teacher: { select: teacherSelect },
       category: { select: categorySelect },
       modules: {
         orderBy: { order: "asc" },
-        include: {
+        select: {
+          id: true,
+          title: true,
+          order: true,
           lessons: {
             orderBy: { order: "asc" },
+            select: {
+              id: true,
+              title: true,
+              order: true,
+            },
           },
         },
       },
@@ -180,15 +295,6 @@ export async function getCourseById(
 
   if (!course) {
     throw new AppError("Course not found", 404);
-  }
-
-  // Visibility check: Return 404 (not 403) when user must not see the course
-  if (course.status !== "PUBLISHED") {
-    const isOwner = course.teacherId === user.id;
-    const isAdmin = user.role === "ADMIN";
-    if (!isOwner && !isAdmin) {
-      throw new AppError("Course not found", 404);
-    }
   }
 
   return course;

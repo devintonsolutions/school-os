@@ -279,5 +279,3 @@ All list endpoints return:
 
 - `errorCode` is still missing from the global error middleware; see
   `dev2-global-changes-needed.md` section 1.
-- `GET /courses/:id` still returns nested lessons without an enrollment check;
-  see `dev2-global-changes-needed.md` section 3.

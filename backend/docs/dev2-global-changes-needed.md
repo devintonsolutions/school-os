@@ -31,20 +31,20 @@ they touch shared/global files owned by Developer 1.
   approval because the DB is shared.
 - **Status:** open — schema.prisma was **not** touched by Developer 2.
 
-## 3. `GET /courses/:id` leaks lessons to non-enrolled students
+## 3. `GET /courses/:id` lesson content leak (fixed)
 
 - **Requirement:** SRS UC-05 (PDF p.20) expects the student to be **enrolled**
   before opening/completing a lesson.
-- **Current behaviour:** `getCourseById` (`backend/src/modules/courses/course.service.ts`)
-  includes `modules.lessons` for **any authenticated user** when the course is
-  `PUBLISHED`; it does not check enrollment.
-- **Inconsistency:** the new Lessons API enforces `PUBLISHED` + enrollment for
-  students (`403 Enrollment required`), but course detail still returns the
-  same lessons to non-enrolled users.
-- **Suggested fix (separate task):** apply the same enrollment check in
-  `getCourseById`, or stop nesting `lessons` there and let clients use
-  `GET /courses/:courseId/lessons`.
-- **Status:** open — `course.service.ts` was **not** edited in the Lessons API task.
+- **Previous behaviour:** `getCourseById` (`backend/src/modules/courses/course.service.ts`)
+  returned full `modules.lessons` (including `content` and `videoUrl`) to any
+  authenticated user for a `PUBLISHED` course, without checking enrollment.
+- **Fixed behaviour:**
+  - Owner teacher, admin and enrolled students receive the full course detail.
+  - Non-owner teachers and non-enrolled students receive a curriculum preview:
+    modules with `id`, `title`, `order`, and lessons with `id`, `title`, `order`.
+  - Preview responses omit lesson `content`, `videoUrl` and `moduleId`.
+  - DRAFT/ARCHIVED courses remain hidden (`404`) from non-owner/admin users.
+- **Status:** fixed in `course.service.ts` (no schema change).
 
 ## 4. Enrollment ownership and no unenroll endpoint
 
