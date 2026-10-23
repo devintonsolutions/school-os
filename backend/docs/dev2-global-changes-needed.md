@@ -50,3 +50,9 @@ they touch shared/global files owned by Developer 1.
 
 - SRS section 29/43 assigns Enrollment to Developer 3; Team Guide section 10/32 assigns it to Developer 2. Built by Developer 2.
 - No unenroll endpoint was added (FR-21 to FR-23 / UC-04 do not request one); `EnrollmentStatus.DROPPED` remains unused.
+
+## 5. Progress ownership and document gaps
+
+- (a) SRS section 43 gives FR-24 to Developer 3; Team Guide section 10/31 gives it to Developer 2. Built by Developer 2.
+- (b) FR-25 says "latest incomplete lesson", but LessonProgress has no last-viewed field; this API uses the next incomplete lesson in curriculum order (module.order, then lesson.order).
+- (c) FR-24 mentions assignment/quiz weighting; this API is lesson-only because assignments and quizzes belong to Developer 3.
