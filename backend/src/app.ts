@@ -3,6 +3,7 @@ import authRouter from "./routes/auth.router";
 import userRouter from "./routes/users.router";
 import categoryRouter from "./routes/category.router";
 import courseRouter from "./routes/course.router";
+import moduleRouter from "./routes/module.router";
 import assignmentsRouter from "./routes/assignments.router";
 import quizzesRouter from "./routes/quizzes.router";
 import { errorMiddleware } from "./middleware/error.middleware";
@@ -22,6 +23,7 @@ app.use("/api/v1/users", userRouter);
 // Core LMS (Developer 2)
 app.use("/api/v1/categories", categoryRouter);
 app.use("/api/v1/courses", courseRouter);
+app.use("/api/v1", moduleRouter);
 
 // Assessments (Developer 3)
 app.use("/api/v1/assignments", assignmentsRouter);

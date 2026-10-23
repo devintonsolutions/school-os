@@ -1,4 +1,15 @@
 import { z } from "zod";
+import { paginationQuerySchema } from "../lms-shared/common.schema";
+
+/**
+ * Validates the `:courseId` route parameter for course-scoped module routes.
+ * (The shared `uuidParamSchema` validates a param named `id`, not `courseId`.)
+ */
+export const courseIdParamSchema = z.object({
+  courseId: z.uuid("Course ID must be a valid UUID"),
+});
+
+export type CourseIdParamInput = z.infer<typeof courseIdParamSchema>;
 
 /**
  * Schema for creating a new module within a course.
@@ -109,3 +120,20 @@ export const reorderModulesSchema = z
   .strict();
 
 export type ReorderModulesInput = z.infer<typeof reorderModulesSchema>;
+
+/**
+ * Query schema for listing modules of a course.
+ *
+ * Reuses the shared `page`/`limit` rules (limit max 50) but raises the
+ * default page size to 50, since a curriculum is normally small.
+ */
+export const listModulesQuerySchema = paginationQuerySchema.extend({
+  limit: z.coerce
+    .number()
+    .int("Limit must be an integer")
+    .positive("Limit must be greater than 0")
+    .max(50, "Limit cannot exceed 50")
+    .default(50),
+});
+
+export type ListModulesQueryInput = z.infer<typeof listModulesQuerySchema>;
