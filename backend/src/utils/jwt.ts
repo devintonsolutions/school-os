@@ -66,3 +66,4 @@ export function verifyAccessToken(token: string): AccessTokenPayload {
     throw new AppError("Invalid or expired access token", 401);
   }
 }
+

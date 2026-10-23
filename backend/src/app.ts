@@ -1,7 +1,10 @@
 import express from "express";
 import authRouter from "./routes/auth.router";
+import userRouter from "./routes/users.router";
 import categoryRouter from "./routes/category.router";
 import courseRouter from "./routes/course.router";
+import assignmentsRouter from "./routes/assignments.router";
+import quizzesRouter from "./routes/quizzes.router";
 import { errorMiddleware } from "./middleware/error.middleware";
 
 const app = express();
@@ -9,18 +12,20 @@ const app = express();
 app.use(express.json());
 
 app.get("/health", (req, res) => {
-  res.json({
-    status: "ok",
-  });
+  res.json({ status: "ok" });
 });
 
-app.use("/api/auth", authRouter);
+// Auth & Users (Developer 1)
+app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/users", userRouter);
 
-// Core LMS Routes (Developer 2)
-// TODO [Team Lead]: Confirm prefix convention: currently "/api", may become "/api/v1"
-const API_PREFIX = "/api";
-app.use(`${API_PREFIX}/categories`, categoryRouter);
-app.use(`${API_PREFIX}/courses`, courseRouter);
+// Core LMS (Developer 2)
+app.use("/api/v1/categories", categoryRouter);
+app.use("/api/v1/courses", courseRouter);
+
+// Assessments (Developer 3)
+app.use("/api/v1/assignments", assignmentsRouter);
+app.use("/api/v1/quizzes", quizzesRouter);
 
 // Must be after all routes
 app.use(errorMiddleware);

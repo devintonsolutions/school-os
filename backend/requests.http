@@ -1,0 +1,240 @@
+### Variables
+@baseUrl = http://localhost:4000
+@accessToken = YOUR_ACCESS_TOKEN_HERE
+@refreshToken = YOUR_REFRESH_TOKEN_HERE
+@courseId = 00000000-0000-0000-0000-000000000001
+@assignmentId = YOUR_ASSIGNMENT_ID_HERE
+@submissionId = YOUR_SUBMISSION_ID_HERE
+@quizId = YOUR_QUIZ_ID_HERE
+@attemptId = YOUR_ATTEMPT_ID_HERE
+
+### ============================================================
+### AUTHENTICATION & PROFILE
+### ============================================================
+
+### 1. Health Check
+GET {{baseUrl}}/health
+
+### 2. Sign Up (Create Student Account)
+POST {{baseUrl}}/api/v1/auth/signup
+Content-Type: application/json
+
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john.doe@example.com",
+  "password": "Password123!"
+}
+
+### 3. Log In
+POST {{baseUrl}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "john.doe@example.com",
+  "password": "Password123!"
+}
+
+### 4. Get Current User Profile (Protected)
+GET {{baseUrl}}/api/v1/auth/me
+Authorization: Bearer {{accessToken}}
+
+### 5. Update Profile
+PATCH {{baseUrl}}/api/v1/auth/me
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "firstName": "Johnny",
+  "bio": "Software Engineering Student"
+}
+
+### 6. Refresh Access Token
+POST {{baseUrl}}/api/v1/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### 7. Log Out (Revoke Refresh Token)
+POST {{baseUrl}}/api/v1/auth/logout
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+
+### ============================================================
+### DEVELOPER 3: ASSIGNMENTS & SUBMISSIONS MODULE
+### ============================================================
+
+### 8. Create Assignment (Teacher or Admin)
+POST {{baseUrl}}/api/v1/assignments
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Assignment 1: Algorithms & Data Structures",
+  "description": "Implement a binary search tree and test edge cases.",
+  "courseId": "{{courseId}}",
+  "dueDate": "2026-12-31T23:59:59.000Z",
+  "maxScore": 100
+}
+
+### 9. Get Assignments by Course (Enrolled Student, Teacher, or Admin)
+GET {{baseUrl}}/api/v1/assignments/course/{{courseId}}
+Authorization: Bearer {{accessToken}}
+
+### 10. Get Assignment Details by ID
+GET {{baseUrl}}/api/v1/assignments/{{assignmentId}}
+Authorization: Bearer {{accessToken}}
+
+### 11. Update Assignment (Teacher who owns course or Admin)
+PATCH {{baseUrl}}/api/v1/assignments/{{assignmentId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Assignment 1: Advanced Data Structures",
+  "maxScore": 120
+}
+
+### 12. Submit Assignment (Enrolled Student)
+POST {{baseUrl}}/api/v1/assignments/{{assignmentId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "content": "Here is my solution code and implementation notes for the assignment.",
+  "fileUrl": "https://example.com/files/my-solution.zip"
+}
+
+### 13. Get My Submission (Student)
+GET {{baseUrl}}/api/v1/assignments/{{assignmentId}}/submissions/me
+Authorization: Bearer {{accessToken}}
+
+### 14. List All Submissions for Assignment (Teacher or Admin)
+GET {{baseUrl}}/api/v1/assignments/{{assignmentId}}/submissions
+Authorization: Bearer {{accessToken}}
+
+### 15. Grade Submission (Teacher or Admin)
+PATCH {{baseUrl}}/api/v1/assignments/submissions/{{submissionId}}/grade
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "score": 95,
+  "feedback": "Excellent work! Well documented and clean code."
+}
+
+### 16. Delete Assignment (Teacher or Admin)
+DELETE {{baseUrl}}/api/v1/assignments/{{assignmentId}}
+Authorization: Bearer {{accessToken}}
+
+
+### ============================================================
+### DEVELOPER 3: QUIZZES & AUTOMATED GRADING ENGINE
+### ============================================================
+
+### 17. Create Quiz (Teacher or Admin)
+POST {{baseUrl}}/api/v1/quizzes
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Quiz 1: Data Structures Fundamentals",
+  "description": "Test your knowledge on Stacks, Queues, and Binary Search Trees.",
+  "courseId": "{{courseId}}",
+  "timeLimit": 30
+}
+
+### 18. Add Question: Single Choice (Teacher or Admin)
+POST {{baseUrl}}/api/v1/quizzes/{{quizId}}/questions
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "questionText": "What is the average time complexity of searching in a Balanced Binary Search Tree?",
+  "questionType": "SINGLE_CHOICE",
+  "points": 2,
+  "options": [
+    { "optionText": "O(1)", "isCorrect": false },
+    { "optionText": "O(log n)", "isCorrect": true },
+    { "optionText": "O(n)", "isCorrect": false },
+    { "optionText": "O(n^2)", "isCorrect": false }
+  ]
+}
+
+### 19. Add Question: True/False (Teacher or Admin)
+POST {{baseUrl}}/api/v1/quizzes/{{quizId}}/questions
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "questionText": "A queue follows the Last-In-First-Out (LIFO) order.",
+  "questionType": "TRUE_FALSE",
+  "points": 1,
+  "options": [
+    { "optionText": "True", "isCorrect": false },
+    { "optionText": "False", "isCorrect": true }
+  ]
+}
+
+### 20. Add Question: Short Answer (Teacher or Admin)
+POST {{baseUrl}}/api/v1/quizzes/{{quizId}}/questions
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "questionText": "Which data structure operates on a First-In-First-Out (FIFO) principle?",
+  "questionType": "SHORT_ANSWER",
+  "points": 2,
+  "options": [
+    { "optionText": "queue", "isCorrect": true }
+  ]
+}
+
+### 21. Get Quizzes by Course (Student, Teacher, or Admin)
+GET {{baseUrl}}/api/v1/quizzes/course/{{courseId}}
+Authorization: Bearer {{accessToken}}
+
+### 22. Get Quiz Details & Questions (Student View hides answers, Teacher View shows isCorrect)
+GET {{baseUrl}}/api/v1/quizzes/{{quizId}}
+Authorization: Bearer {{accessToken}}
+
+### 23. Start Quiz Attempt (Enrolled Student)
+POST {{baseUrl}}/api/v1/quizzes/{{quizId}}/attempts/start
+Authorization: Bearer {{accessToken}}
+
+### 24. Submit Quiz Attempt & Run Automated Grading Engine (Student)
+POST {{baseUrl}}/api/v1/quizzes/attempts/{{attemptId}}/submit
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "answers": [
+    {
+      "questionId": "QUESTION_1_ID",
+      "selectedOptionId": "OPTION_ID_HERE"
+    },
+    {
+      "questionId": "QUESTION_2_ID",
+      "selectedOptionId": "OPTION_ID_HERE"
+    },
+    {
+      "questionId": "QUESTION_3_ID",
+      "answerText": "queue"
+    }
+  ]
+}
+
+### 25. Get Student's Past Attempts & Scores (Student)
+GET {{baseUrl}}/api/v1/quizzes/{{quizId}}/attempts/me
+Authorization: Bearer {{accessToken}}
+
+### 26. List All Student Attempts for a Quiz (Teacher or Admin)
+GET {{baseUrl}}/api/v1/quizzes/{{quizId}}/attempts
+Authorization: Bearer {{accessToken}}
+

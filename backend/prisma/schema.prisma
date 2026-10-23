@@ -56,6 +56,7 @@ model User {
   notifications     Notification[]
   reviews           Review[]
   certificates      Certificate[]
+  emailVerificationTokens EmailVerificationToken[]
 }
 
 model RefreshToken {
@@ -495,4 +496,18 @@ model Certificate {
 
   @@unique([studentId, courseId])
   @@map("certificates")
+}
+
+
+model EmailVerificationToken {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
 }
