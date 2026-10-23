@@ -5,29 +5,36 @@ export const enrollmentStatusEnum = z.enum(["ACTIVE", "COMPLETED", "DROPPED"]);
 export type EnrollmentStatus = z.infer<typeof enrollmentStatusEnum>;
 
 /**
- * Schema for enrolling into a course (POST /enrollments).
- *
- * Intentionally Excluded from Request Body:
- * - `studentId`: Extracted securely from `req.user.id`. Clients cannot enroll on behalf of others.
- * - `status`: Always initialized as `ACTIVE` (or re-activated if previously `DROPPED`).
- * - `enrolledAt`: System timestamp.
+ * Validates the `:courseId` route parameter for course-scoped enrollment routes.
+ * (The shared `uuidParamSchema` validates a param named `id`, not `courseId`.)
  */
-export const enrollSchema = z
-  .object({
-    courseId: z.uuid("Course ID must be a valid UUID"),
-  })
-  .strict();
+export const courseIdParamSchema = z.object({
+  courseId: z.uuid("Course ID must be a valid UUID"),
+});
 
-export type EnrollInput = z.infer<typeof enrollSchema>;
+export type CourseIdParamInput = z.infer<typeof courseIdParamSchema>;
 
 /**
- * Query schema for listing student enrollments (GET /enrollments/my).
+ * Query schema for listing enrollments.
  *
- * Intentionally Excluded from Query Parameters:
- * - `studentId`: Query filters are automatically scoped to `req.user.id` in the service layer.
+ * Used by:
+ * - `GET /enrollments/my` (student's own enrollments)
+ * - `GET /courses/:courseId/enrollments` (teacher/admin roster)
+ *
+ * Intentionally Excluded:
+ * - `studentId`: always taken from the authenticated user for `/my`.
+ * - `courseId`: always taken from the route for the roster.
  */
 export const listEnrollmentsQuerySchema = paginationQuerySchema.extend({
+  limit: z.coerce
+    .number()
+    .int("Limit must be an integer")
+    .positive("Limit must be greater than 0")
+    .max(50, "Limit cannot exceed 50")
+    .default(50),
   status: enrollmentStatusEnum.optional(),
 });
 
-export type ListEnrollmentsQueryInput = z.infer<typeof listEnrollmentsQuerySchema>;
+export type ListEnrollmentsQueryInput = z.infer<
+  typeof listEnrollmentsQuerySchema
+>;

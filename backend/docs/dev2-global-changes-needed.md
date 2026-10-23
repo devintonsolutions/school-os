@@ -45,3 +45,8 @@ they touch shared/global files owned by Developer 1.
   `getCourseById`, or stop nesting `lessons` there and let clients use
   `GET /courses/:courseId/lessons`.
 - **Status:** open — `course.service.ts` was **not** edited in the Lessons API task.
+
+## 4. Enrollment ownership and no unenroll endpoint
+
+- SRS section 29/43 assigns Enrollment to Developer 3; Team Guide section 10/32 assigns it to Developer 2. Built by Developer 2.
+- No unenroll endpoint was added (FR-21 to FR-23 / UC-04 do not request one); `EnrollmentStatus.DROPPED` remains unused.
