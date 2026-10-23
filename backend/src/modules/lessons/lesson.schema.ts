@@ -1,4 +1,23 @@
 import { z } from "zod";
+import { paginationQuerySchema } from "../lms-shared/common.schema";
+
+/**
+ * Validates the `:courseId` route parameter for course-scoped lesson routes.
+ */
+export const courseIdParamSchema = z.object({
+  courseId: z.uuid("Course ID must be a valid UUID"),
+});
+
+export type CourseIdParamInput = z.infer<typeof courseIdParamSchema>;
+
+/**
+ * Validates the `:moduleId` route parameter for module-scoped lesson routes.
+ */
+export const moduleIdParamSchema = z.object({
+  moduleId: z.uuid("Module ID must be a valid UUID"),
+});
+
+export type ModuleIdParamInput = z.infer<typeof moduleIdParamSchema>;
 
 /**
  * Schema for creating a lesson within a module.
@@ -124,3 +143,20 @@ export const reorderLessonsSchema = z
   .strict();
 
 export type ReorderLessonsInput = z.infer<typeof reorderLessonsSchema>;
+
+/**
+ * Query schema for listing lessons of a course.
+ *
+ * Reuses the shared `page`/`limit` rules (limit max 50) but raises the
+ * default page size to 50, matching the Modules API.
+ */
+export const listLessonsQuerySchema = paginationQuerySchema.extend({
+  limit: z.coerce
+    .number()
+    .int("Limit must be an integer")
+    .positive("Limit must be greater than 0")
+    .max(50, "Limit cannot exceed 50")
+    .default(50),
+});
+
+export type ListLessonsQueryInput = z.infer<typeof listLessonsQuerySchema>;
